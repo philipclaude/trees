@@ -1,3 +1,19 @@
+//
+// mapletrees
+// Copyright 2023 Philip Claude Caplan
+//
+// Licensed under the Apache License,
+// Version 2.0(the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations under
+// the License.
+//
 #pragma once
 
 #include <chrono>
@@ -88,8 +104,11 @@ morton_t encode_morton(const T* values, int dim, const T* xmin, const T* xmax) {
 }
 
 template <typename coord_t>
-void get_bounding_box(const coord_t* points, int64_t n_points, int8_t dim,
-                      coord_t* xmin, coord_t* xmax) {
+void get_bounding_box(const coord_t* points,
+                      int64_t n_points,
+                      int8_t dim,
+                      coord_t* xmin,
+                      coord_t* xmax) {
   std::fill(xmin, xmin + dim, std::numeric_limits<coord_t>::max());
   std::fill(xmax, xmax + dim, std::numeric_limits<coord_t>::min());
   for (int64_t i = 0; i < n_points; i++) {
@@ -102,7 +121,9 @@ void get_bounding_box(const coord_t* points, int64_t n_points, int8_t dim,
 }
 
 template <typename coord_t, typename index_t>
-void sort_points_on_zcurve(const coord_t* points, uint64_t n_points, int8_t dim,
+void sort_points_on_zcurve(const coord_t* points,
+                           uint64_t n_points,
+                           int8_t dim,
                            std::vector<index_t>& order) {
   std::vector<coord_t> xmin(dim), xmax(dim);
   get_bounding_box(points, n_points, dim, xmin.data(), xmax.data());
@@ -113,5 +134,6 @@ void sort_points_on_zcurve(const coord_t* points, uint64_t n_points, int8_t dim,
   std::parasort(z.begin(), z.end(), [](const auto& p, const auto& q) {
     return p.second < q.second;
   });
-  for (uint64_t k = 0; k < n_points; k++) order[k] = z[k].first;
+  for (uint64_t k = 0; k < n_points; k++)
+    order[k] = z[k].first;
 }

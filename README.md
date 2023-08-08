@@ -58,15 +58,15 @@ There is some initial support for a radius search (i.e. all points within a radi
 
 For all problems, points were randomly generated in 3d and then sorted along the z-curve. For the kdtrees that are configured with buckets of points in the leaves, a maximum of 12 points were assigned to each bucket (including `nanoflann`). The benchmarks were run on a 2022 MacBook Pro with an Apple M1 Pro chip. Note that both construction and querying were done in parallel for both `nanoflann` and `mapletrees` implementations. See `test/test_kdtree.cpp` for implementation details.
 
-![](test/build-k100.png)
+![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/build-k100.png)
 
 The following plots compare the all k-nearest neighbor time (for various values of k) for the fully balanced `mapletrees` implementation with `nanoflann` since the query for left-balanced tree implementation is slower (at the current time of writing).
 
-![](test/query-k10.png)![](test/query-k50.png)![](test/query-k100.png)
+![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/query-k10.png)![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/query-k50.png)![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/query-k100.png)
 
 Adding the kdtree construction + all nearest neighbor query time produces the plots below - `nanoflann` seems to catch up to `mapletrees` at about `k = 100` so if you need more than 100 nearest neighbors, you may want to use `nanoflann` instead.
 
-![](test/total-k10.png)![](test/total-k50.png)![](test/total-k100.png)
+![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/total-k10.png)![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/total-k50.png)![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/total-k100.png)
 
 #### **memory**
 
