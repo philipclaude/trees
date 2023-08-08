@@ -5,8 +5,7 @@ plt.rcParams["font.family"] = "Futura"
 plt.rcParams["font.size"] = 12
 ext = 'png'
 resolution = 144
-dst = "/Users/philip/Google Drive/My Drive/research/middpolymer/mapletrees/public"
-#dst = "."
+dst = "."
 
 method_name = {0: "balanced", 1: "left-balanced-leaf-full", 2: "left-balanced-leaf-empty", 3: "nanoflann"}
 

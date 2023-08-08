@@ -54,21 +54,7 @@ There is some initial support for a radius search (i.e. all points within a radi
 
 ### **performance**
 
-`mapletrees` was primarily compared with the `nanoflann` library since that is what I mostly used in the past. Overall, construction is faster than `nanoflann`, but querying can be slower. However, the crossover of when this happens usually occurs for problems that I don't generally work on, specifically when doing an all-nearest neighbor query for k > 100. Hopefully, the following data will help to know which kdtree library to select for your application.
-
-For all problems, points were randomly generated in 3d and then sorted along the z-curve. For the kdtrees that are configured with buckets of points in the leaves, a maximum of 12 points were assigned to each bucket (including `nanoflann`). The benchmarks were run on a 2022 MacBook Pro with an Apple M1 Pro chip. Note that both construction and querying were done in parallel for both `nanoflann` and `mapletrees` implementations. See `test/test_kdtree.cpp` for implementation details.
-
-![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/build-k100.png)
-
-The following plots compare the all k-nearest neighbor time (for various values of k) for the fully balanced `mapletrees` implementation with `nanoflann` since the query for left-balanced tree implementation is slower (at the current time of writing).
-
-![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/query-k10.png)![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/query-k50.png)![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/query-k100.png)
-
-Adding the kdtree construction + all nearest neighbor query time produces the plots below - `nanoflann` seems to catch up to `mapletrees` at about `k = 100` so if you need more than 100 nearest neighbors, you may want to use `nanoflann` instead.
-
-![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/total-k10.png)![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/total-k50.png)![](https://drive.google.com/drive/folders/13tDQOO7rH3FoGUGVf7fCxS-037vbcyeg?usp=sharing/total-k100.png)
-
-#### **memory**
+`mapletrees` was primarily compared with the `nanoflann` library since that is what I mostly used in the past. Overall, construction is faster than `nanoflann`, but querying can be slower. However, the crossover of when this happens usually occurs for problems that I don't generally work on, specifically when doing an all-nearest neighbor query for k > 100. Hopefully, the data included in the **Issues** tab will help to know which kdtree library to select for your application. The latest results are described [here](https://github.com/middpolymer/mapletrees/issues/1).
 
 Both balanced and left-balanced (with leaf buckets) trees require `3 x sizeof(index_t)` bytes per point. The left-balanced tree without leaf buckets requires `sizeof(index_t)` bytes per point. `nanoflann` seems to require between 3-4 `x sizeof(index_t)` per point.
 
