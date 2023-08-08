@@ -1,0 +1,13 @@
+{
+	"method":"balanced",
+	"n_samples": 10,
+	"n": 1000000,
+	"t_zcurve": 0.033900,
+	"t_build": 0.042100,
+	"k": 100,
+	"approach": 0,
+	"t_knn": 1.055900,
+	"leaf_size": 12,
+	"memory": 0.012000
+}
+

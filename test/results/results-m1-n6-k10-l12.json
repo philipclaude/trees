@@ -1,0 +1,13 @@
+{
+	"method":"left-balanced-leaf-full",
+	"n_samples": 10,
+	"n": 1000000,
+	"t_zcurve": 0.033800,
+	"t_build": 0.066500,
+	"k": 10,
+	"approach": 0,
+	"t_knn": 0.137600,
+	"leaf_size": 12,
+	"memory": 0.012000
+}
+

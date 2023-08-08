@@ -1,0 +1,13 @@
+{
+	"method":"nanoflann",
+	"n_samples": 10,
+	"n": 100000000,
+	"t_zcurve": 5.122700,
+	"t_build": 12.701300,
+	"k": 50,
+	"approach": 0,
+	"t_knn": 47.189400,
+	"leaf_size": 12,
+	"memory": 1.557274
+}
+
