@@ -5,11 +5,11 @@ plt.rcParams["font.family"] = "Futura"
 plt.rcParams["font.size"] = 12
 ext = 'png'
 resolution = 144
-dst = "."
+dst = "figures"
 
 method_name = {0: "balanced", 1: "left-balanced-leaf-full", 2: "left-balanced-leaf-empty", 3: "nanoflann"}
 
-k = 100
+k = 50
 power = [5, 6, 7, 8]
 sizes = [10 ** p for p in power]
 build = {}
