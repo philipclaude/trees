@@ -40,7 +40,7 @@
 #define kdtree_assert(X) assert(X)
 #endif
 
-#define MAPLE_ASSERT(x)                                                        \
+#define MAPLE_ASSERT(x)                                                  \
   {                                                                      \
     if (!(x)) {                                                          \
       std::cerr << "assertion failed: " << #x << " (" << __FILE__ << ":" \
@@ -473,6 +473,7 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
       for (index_t j = left; j < right; j++) {
         const node_t& n = nodes_[j];
         const index_t leaf_index = n.get_index();
+        if (leaf_index == node_index) continue;
         const coord_t dn =
             squared_distance<coord_t, dim>(x, points_ + dim * leaf_index);
         if (dn < result.max_distance()) result.insert(leaf_index, dn);
@@ -827,6 +828,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
         const index_t aux = node.get_aux();
         for (int j = 0; j < n_leaf; j++) {
           const index_t leaf_index = leaves_[aux + j];
+          if (leaf_index == node_index) continue;
           const coord_t* __restrict__ q = points_ + dim * leaf_index;
           const auto dl = squared_distance<coord_t, dim>(x, q);
           if (dl < result.max_distance()) result.insert(leaf_index, dl);
