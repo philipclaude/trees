@@ -928,6 +928,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
 
 }  // namespace maple
 
+#if HAVE_NANOFLANN
 template <int8_t dim,
           typename coord_t = double,
           typename index_t = uint32_t,
@@ -998,4 +999,4 @@ class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
       tree_;
 };
 
-// #endif
+#endif
