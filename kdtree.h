@@ -40,7 +40,7 @@
 #define kdtree_assert(X) assert(X)
 #endif
 
-#define ASSERT(x)                                                        \
+#define MAPLE_ASSERT(x)                                                        \
   {                                                                      \
     if (!(x)) {                                                          \
       std::cerr << "assertion failed: " << #x << " (" << __FILE__ << ":" \
@@ -86,7 +86,7 @@ struct NearestNeighborSearch {
 
   NearestNeighborSearch(int n, index_t* n_buffer, coord_t* d_buffer)
       : k(n), neighbors(n_buffer), distances(d_buffer) {
-    ASSERT(k > 1);
+    MAPLE_ASSERT(k > 1);
     reset();
   }
 
@@ -412,13 +412,13 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
 
   void knearest(const coord_t* x,
                 NearestNeighborSearch<index_t, coord_t>& search) const {
-    ASSERT(search.approach == NearestNeighborApproach::kRecursive);
+    MAPLE_ASSERT(search.approach == NearestNeighborApproach::kRecursive);
     search_recursive(x, search);
     search.finalize();
   }
 
   void rsearch(const coord_t* x, RadiusSearch<index_t, coord_t>& search) const {
-    ASSERT(search.approach == NearestNeighborApproach::kRecursive);
+    MAPLE_ASSERT(search.approach == NearestNeighborApproach::kRecursive);
     search_recursive(x, search);
     search.finalize();
   }
@@ -976,7 +976,7 @@ class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
   void rsearch(const coord_t* x,
                maple::RadiusSearch<index_t, coord_t>& search) const {
     std::cout << "not implemented" << std::endl;
-    ASSERT(false);
+    MAPLE_ASSERT(false);
   }
 
   index_t nearest(const coord_t* x) const {
