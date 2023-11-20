@@ -174,10 +174,10 @@ static constexpr uint8_t max_4_bits = 15;
 static constexpr uint8_t leaf_axis_value = max_3_bits;
 
 template <typename T>
-T power_of_two(const T& x);
+inline T power_of_two(const T& x);
 
 template <>
-uint32_t power_of_two(const uint32_t& x) {
+inline uint32_t power_of_two(const uint32_t& x) {
   return 0x80000000 >> __builtin_clz(x);
 }
 
@@ -249,8 +249,7 @@ struct BoundingBox {
 
   void update(const coord_t* x) {
 #pragma unroll
-    for (int d = 0; d < dim; ++d)
-      update(x[d], d);
+    for (int d = 0; d < dim; ++d) update(x[d], d);
   }
 
   void update(const coord_t& x, int d) {
@@ -272,18 +271,12 @@ template <int8_t dim, typename coord_t, typename index_t, bool _with_leaves>
 class KdTree;
 template <int8_t dim, typename coord_t, typename index_t, bool _with_leaves>
 void build_level(KdTree<dim, coord_t, index_t, _with_leaves>* tree,
-                 size_t idx_m,
-                 size_t idx_l,
-                 size_t idx_r,
-                 int d,
-                 int level) {
+                 size_t idx_m, size_t idx_l, size_t idx_r, int d, int level) {
   tree->nodes()[idx_m].left = tree->build(idx_l, idx_m, d, ++level);
   tree->nodes()[idx_m].right = tree->build(idx_m + 1, idx_r, d, level);
 }
 
-template <int8_t dim,
-          typename coord_t = double,
-          typename index_t = uint32_t,
+template <int8_t dim, typename coord_t = double, typename index_t = uint32_t,
           bool _with_leaves = true>
 class KdTree : public KdTreeNd<coord_t, index_t> {
  public:
@@ -291,8 +284,7 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
   using node_t = KdTreeNode<index_t>;
   using box_t = BoundingBox<dim, coord_t>;
 
-  KdTree(const coord_t* points,
-         index_t n_points,
+  KdTree(const coord_t* points, index_t n_points,
          KdTreeOptions options = KdTreeOptions())
       : points_(points),
         nodes_(n_points),
@@ -300,8 +292,7 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
         max_dim_(options.max_dim) {
     assert(n_points << n_axis_bits < std::numeric_limits<index_t>::max());
     if (options.max_dim < 0) max_dim_ = dim;
-    for (index_t i = 0; i < n_points; i++)
-      nodes_[i].set_index(i);
+    for (index_t i = 0; i < n_points; i++) nodes_[i].set_index(i);
 
     if (options.parallel) {
       size_t n_threads = std::thread::hardware_concurrency();
@@ -311,8 +302,7 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
     root_index_ = build(0, nodes_.size(), 0, 0);
 
     // calculate root bounding box
-    for (size_t i = 0; i < n_points; i++)
-      root_box_.update(points_ + i * dim);
+    for (size_t i = 0; i < n_points; i++) root_box_.update(points_ + i * dim);
   }
 
   index_t build(size_t idx_l, size_t idx_r, int axis, int32_t level) {
@@ -391,8 +381,7 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
           std::thread(build_level<dim, coord_t, index_t, _with_leaves>, this,
                       idx_m, idx_l, idx_r, axis, level));
       if (threads_.size() == size_t(1 << paralevel_))
-        for (auto& t : threads_)
-          t.join();
+        for (auto& t : threads_) t.join();
     }
 
     return idx_m + 1;  // null nodes have index 0
@@ -456,10 +445,8 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
 
  private:
   template <typename Search_t>
-  inline void _search_recursive(const coord_t* __restrict__ x,
-                                Search_t& result,
-                                const node_t& node,
-                                box_t& box,
+  inline void _search_recursive(const coord_t* __restrict__ x, Search_t& result,
+                                const node_t& node, box_t& box,
                                 coord_t box_dist) const {
     const index_t node_index = node.get_index();
     const index_t left = node.left;
@@ -550,13 +537,8 @@ class KdTree_LeftBalanced;
 
 template <int8_t dim, typename coord_t, typename index_t, bool with_leaves>
 void build_level_left_balanced(
-    KdTree_LeftBalanced<dim, coord_t, index_t, with_leaves>* tree,
-    size_t nc,
-    size_t nm,
-    size_t nl,
-    size_t nr,
-    int d,
-    int level) {
+    KdTree_LeftBalanced<dim, coord_t, index_t, with_leaves>* tree, size_t nc,
+    size_t nm, size_t nl, size_t nr, int d, int level) {
   if (nm - nl > 0) tree->build(nc << 1, nl, nm, d, level);
   if (nr - nm > 0) tree->build((nc << 1) + 1, nm + 1, nr, d, level);
 }
@@ -576,9 +558,7 @@ struct node_data_t<index_t, false> {};
 
 }  // namespace detail
 
-template <int8_t dim,
-          typename coord_t = double,
-          typename index_t = uint32_t,
+template <int8_t dim, typename coord_t = double, typename index_t = uint32_t,
           bool with_leaves = false>
 class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
  public:
@@ -641,8 +621,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
     }
   };
 
-  KdTree_LeftBalanced(const coord_t* points,
-                      index_t n_points,
+  KdTree_LeftBalanced(const coord_t* points, index_t n_points,
                       KdTreeOptions options = KdTreeOptions())
       : points_(points),
         nodes_(n_points + 1),
@@ -652,8 +631,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
     const auto n_shift_bits = std::max(n_aux_bits, n_axis_bits);
     assert(n_points << n_shift_bits < std::numeric_limits<index_t>::max());
     if (options.max_dim < 0) max_dim_ = dim;
-    for (index_t i = 0; i < n_points; i++)
-      index_[i] = i;
+    for (index_t i = 0; i < n_points; i++) index_[i] = i;
     if constexpr (with_leaves) leaves_.resize(n_points);
 
     if (options.parallel && n_points > 64) {
@@ -678,8 +656,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
         nodes_[nc].set_leaf();
         nodes_[nc].set_n_leaf(n);
         nodes_[nc].set_aux(n_leaf_);
-        for (int j = 0; j < n; j++)
-          leaves_[n_leaf_ + j] = index_[nl + j];
+        for (int j = 0; j < n; j++) leaves_[n_leaf_ + j] = index_[nl + j];
         n_leaf_ += n;
         lock_.unlock();
         return;
@@ -754,8 +731,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
           build_level_left_balanced<dim, coord_t, index_t, with_leaves>, this,
           nc, nm, nl, nr, axis, ++level));
       if (threads_.size() == size_t(1 << paralevel_))
-        for (auto& t : threads_)
-          t.join();
+        for (auto& t : threads_) t.join();
     }
   }
 
@@ -811,8 +787,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
 
  private:
   template <typename Search_t>
-  inline void search_recursive(const coord_t* __restrict__ x,
-                               Search_t& result,
+  inline void search_recursive(const coord_t* __restrict__ x, Search_t& result,
                                const index_t idx) const {
     if (idx >= n_nodes_) return;
     const node_t& node = nodes_[idx];
@@ -931,9 +906,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
 }  // namespace maple
 
 #if HAVE_NANOFLANN
-template <int8_t dim,
-          typename coord_t = double,
-          typename index_t = uint32_t,
+template <int8_t dim, typename coord_t = double, typename index_t = uint32_t,
           bool with_leaves = true>
 class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
  private:
@@ -958,8 +931,7 @@ class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
   };
 
  public:
-  KdTree_nanoflann(const coord_t* x,
-                   size_t n,
+  KdTree_nanoflann(const coord_t* x, size_t n,
                    maple::KdTreeOptions options = maple::KdTreeOptions())
       : cloud_(x, n) {
     tree_ = std::make_unique<nanoflann::KDTreeSingleIndexAdaptor<
@@ -995,9 +967,7 @@ class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
  private:
   PointCloud cloud_;
   std::unique_ptr<nanoflann::KDTreeSingleIndexAdaptor<
-      nanoflann::L2_Adaptor<coord_t, PointCloud>,
-      PointCloud,
-      dim> >
+      nanoflann::L2_Adaptor<coord_t, PointCloud>, PointCloud, dim> >
       tree_;
 };
 
