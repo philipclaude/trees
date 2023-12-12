@@ -58,13 +58,10 @@ struct KdTreeOptions {
   int max_dim{-1};
 };
 
-template <typename index_t, typename coord_t>
-struct NearestNeighborSearch;
-template <typename index_t, typename coord_t>
-struct RadiusSearch;
+template <typename index_t, typename coord_t> struct NearestNeighborSearch;
+template <typename index_t, typename coord_t> struct RadiusSearch;
 
-template <typename coord_t, typename index_t>
-class KdTreeNd {
+template <typename coord_t, typename index_t> class KdTreeNd {
  public:
   virtual ~KdTreeNd() {}
   virtual void knearest(
@@ -77,8 +74,7 @@ class KdTreeNd {
   virtual int leaf_size() const = 0;
 };
 
-template <typename index_t, typename coord_t>
-struct NearestNeighborSearch {
+template <typename index_t, typename coord_t> struct NearestNeighborSearch {
   int n_neighbors{0}, k{0};
   coord_t* distances{nullptr};
   index_t* neighbors{nullptr};
@@ -101,7 +97,7 @@ struct NearestNeighborSearch {
   inline void insert(index_t n, coord_t d) {
     int i = n_neighbors - 1;
     int j = i - 1;
-    while (distances[j] > d && i > 0) {
+    while (i > 0 && distances[j] > d) {
       neighbors[i] = neighbors[j];
       distances[i] = distances[j];
       i = j;
@@ -119,8 +115,7 @@ struct NearestNeighborSearch {
   inline bool full() const { return n_neighbors == k; }
 };
 
-template <typename index_t, typename coord_t>
-struct RadiusSearch {
+template <typename index_t, typename coord_t> struct RadiusSearch {
   int capacity{0}, n_neighbors{0}, k{0};
   coord_t* distances{nullptr};
   index_t* neighbors{nullptr};
@@ -173,11 +168,9 @@ static constexpr uint8_t max_3_bits = 7;
 static constexpr uint8_t max_4_bits = 15;
 static constexpr uint8_t leaf_axis_value = max_3_bits;
 
-template <typename T>
-inline T power_of_two(const T& x);
+template <typename T> inline T power_of_two(const T& x);
 
-template <>
-inline uint32_t power_of_two(const uint32_t& x) {
+template <> inline uint32_t power_of_two(const uint32_t& x) {
   return 0x80000000 >> __builtin_clz(x);
 }
 
@@ -193,8 +186,7 @@ inline T squared_distance(const T* __restrict__ x, const T* __restrict__ y) {
 }
 
 static std::string node_type_name[3] = {"internal", "leaf", "bucket"};
-template <typename index_t = uint32_t>
-struct KdTreeNode {
+template <typename index_t = uint32_t> struct KdTreeNode {
   index_t index{nullnode_ptr};
   index_t left{nullnode_ptr};
   index_t right{nullnode_ptr};
@@ -230,8 +222,7 @@ struct KdTreeNode {
   }
 };
 
-template <int8_t dim, typename coord_t>
-struct BoundingBox {
+template <int8_t dim, typename coord_t> struct BoundingBox {
  public:
   BoundingBox() { reset(); }
   BoundingBox(const BoundingBox& b) {
@@ -544,17 +535,14 @@ void build_level_left_balanced(
 }
 
 namespace detail {
-template <typename index_t, bool _with_leaves>
-struct node_data_t;
+template <typename index_t, bool _with_leaves> struct node_data_t;
 
-template <typename index_t>
-struct node_data_t<index_t, true> {
+template <typename index_t> struct node_data_t<index_t, true> {
   node_data_t() : aux(0) {}
   index_t aux;
 };
 
-template <typename index_t>
-struct node_data_t<index_t, false> {};
+template <typename index_t> struct node_data_t<index_t, false> {};
 
 }  // namespace detail
 
@@ -920,10 +908,7 @@ class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
       return points_[dim * k + d];
     }
 
-    template <class BBOX>
-    bool kdtree_get_bbox(BBOX&) const {
-      return false;
-    }
+    template <class BBOX> bool kdtree_get_bbox(BBOX&) const { return false; }
 
    private:
     const coord_t* points_;
