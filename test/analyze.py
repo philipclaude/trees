@@ -55,7 +55,7 @@ h_le = plt.loglog(sizes, build["left-balanced-leaf-empty"], 'o-')
 plt.xlabel('# points', fontsize=12)
 plt.title('build time (s)', fontsize=12)
 plt.legend(handles=[h_b[0], h_lf[0], h_le[0], h_n[0]], labels=[
-           'balanced', 'left-bal. (12 pts/leaf)', 'left-bal. (1 pt/leaf)' 'nanoflann'])
+           'balanced', 'left-balanced (12 pts/leaf)', 'left-balanced (1 pt/leaf)', 'nanoflann'])
 # plt.annotate('nanoflann', weight='bold', xy=(
 #     10 ** 5, 0.04), color=h_n[0].get_color())
 # plt.annotate('balanced', weight='bold',
