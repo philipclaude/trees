@@ -65,10 +65,10 @@ jobs:
         mv figures ../
         cd ..
     - name: upload results
-        uses: actions/upload-artifact@v3
-        with:
-          name: results
-          path: figures
+      uses: actions/upload-artifact@v3
+      with:
+        name: results
+        path: figures
 
 
   # Single deploy job since we're just deploying
