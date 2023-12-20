@@ -84,4 +84,4 @@ plt.legend(handles=[h_b[0], h_l[0], h_n[0]], labels=[
            'balanced', 'left-balanced', 'nanoflann'])
 plt.savefig(f"{dst}/total-k{k}.{ext}", dpi=resolution)
 
-plt.show()
+# plt.show()
