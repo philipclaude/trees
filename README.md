@@ -67,7 +67,7 @@ Both balanced and left-balanced (with leaf buckets) trees require `3 x sizeof(in
 
 ### **License**
 
-`mapletrees` is distributed under the Apache-2.0 License.
+The `trees` library is distributed under the Apache-2.0 License.
 
 Copyright 2023 Philip Claude Caplan
 
