@@ -9,6 +9,7 @@ struct json {
   template <typename T> std::string convert(const T& v) {
     return std::to_string(v);
   }
+
   template <typename T> void add(const std::string& key, const T& v) {
     if (n_keys > 0) str += ",\n";
     str += "\t\"" + key + "\": " + convert(v);
@@ -20,7 +21,9 @@ struct json {
   std::string str;
 };
 
-template <> std::string json::convert(const std::string& v) { return v; }
+template <> std::string json::convert(const std::string& v) {
+  return "\"" + v + "\"";
+}
 
 using index_t = uint32_t;
 using coord_t = double;

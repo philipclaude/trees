@@ -1,4 +1,4 @@
-from matplotlib import pyplot as plt 
+from matplotlib import pyplot as plt
 import json
 
 plt.rcParams["font.family"] = "Futura"
@@ -7,9 +7,10 @@ ext = 'png'
 resolution = 144
 dst = "figures"
 
-method_name = {0: "balanced", 1: "left-balanced-leaf-full", 2: "left-balanced-leaf-empty", 3: "nanoflann"}
+method_name = {0: "balanced", 1: "left-balanced-leaf-full",
+               2: "left-balanced-leaf-empty", 3: "nanoflann"}
 
-k = 50
+k = 100
 power = [5, 6, 7, 8]
 sizes = [10 ** p for p in power]
 build = {}
@@ -30,19 +31,6 @@ for m in [0, 1, 2, 3]:
             t_b.append(data["t_build"])
             t_q.append(data["t_knn"])
             mem.append(data["memory"])
-            '''
-            data = f.read()
-            s = data.split(',')
-            for i in range(len(s)):
-                if 'method' in s[i]:
-                    t = s[i].split(':')
-                    u = ("\"" + t[1] + "\"").replace(' ','')
-                    data = data.replace(t[1], u)
-                    print(data)
-                    with open("results/" + filename, "w") as g:
-                        g.write(data)
-                        break
-            '''
 
     method = method_name[m]
     build[method] = t_b
@@ -56,7 +44,8 @@ print(memory)
 total = {}
 for method in build:
     assert method in query
-    total[method] = [build[method][i] + query[method][i] for i in range(len(build[method]))]
+    total[method] = [build[method][i] + query[method][i]
+                     for i in range(len(build[method]))]
 
 plt.figure()
 h_b = plt.loglog(sizes, build["balanced"], 'o-')
@@ -65,10 +54,14 @@ h_lf = plt.loglog(sizes, build["left-balanced-leaf-full"], 'o-')
 h_le = plt.loglog(sizes, build["left-balanced-leaf-empty"], 'o-')
 plt.xlabel('# points', fontsize=12)
 plt.title('build time (s)', fontsize=12)
-plt.annotate('nanoflann', weight='bold', xy = (10 ** 5, 0.04), color=h_n[0].get_color())
-plt.annotate('maple-balanced', weight='bold', xy = (10 ** 7, 0.2), color = h_b[0].get_color())
-plt.annotate('maple-left-balanced\n(max 12 points / leaf)', weight='bold', xy = (10 ** 7.5, 2.5), xytext = (10 ** 6, 4), arrowprops=dict(shrink=0.01, width=2, edgecolor='black', facecolor=h_lf[0].get_color(), headwidth=8), color = h_lf[0].get_color())
-plt.annotate('maple-left-balanced\n(1 point / leaf)', weight='bold', xy = (10 ** 6.025, 0.03), xytext = (10 ** 6.25, 0.004), arrowprops=dict(shrink=0.01, width=2, edgecolor='black', facecolor = h_le[0].get_color(), headwidth=8), color = h_le[0].get_color())
+plt.annotate('nanoflann', weight='bold', xy=(
+    10 ** 5, 0.04), color=h_n[0].get_color())
+plt.annotate('balanced', weight='bold',
+             xy=(10 ** 7, 0.2), color=h_b[0].get_color())
+plt.annotate('left-balanced\n(max 12 points / leaf)', weight='bold', xy=(10 ** 7.5, 2.5), xytext=(10 ** 6, 4),
+             arrowprops=dict(shrink=0.01, width=2, edgecolor='black', facecolor=h_lf[0].get_color(), headwidth=8), color=h_lf[0].get_color())
+plt.annotate('left-balanced\n(1 point / leaf)', weight='bold', xy=(10 ** 6.025, 0.03), xytext=(10 ** 6.25, 0.004),
+             arrowprops=dict(shrink=0.01, width=2, edgecolor='black', facecolor=h_le[0].get_color(), headwidth=8), color=h_le[0].get_color())
 plt.savefig(f"{dst}/build-k{k}.{ext}", dpi=resolution)
 
 plt.figure()
@@ -77,21 +70,8 @@ h_n = plt.loglog(sizes, query["nanoflann"], 'o--')
 h_l = plt.loglog(sizes, query["left-balanced-leaf-full"], '^-')
 plt.xlabel('# points', fontsize=12)
 plt.title(f"k = {k}, query time (s)", fontsize=12)
-plt.legend(handles=[h_b[0], h_l[0], h_n[0]], labels=['maple-balanced', 'maple-left-balanced', 'nanoflann'])
-'''
-p = (10 ** 5, 0.1)
-if k == 50:
-    p = (10 ** 5, 0.2)
-elif k == 100:
-    p = (10 ** 5, 0.4)
-plt.annotate('nanoflann', weight='bold', xy = p, color=h_n[0].get_color())
-p = (10 ** 7, 0.8)
-if k == 50:
-    p = (10 ** 7, 2)
-elif k == 100:
-    p = (10 ** 7, 6)
-plt.annotate('maple-balanced', weight='bold', xy = p, color = h_b[0].get_color())
-'''
+plt.legend(handles=[h_b[0], h_l[0], h_n[0]], labels=[
+           'balanced', 'left-balanced', 'nanoflann'])
 plt.savefig(f"{dst}/query-k{k}.{ext}", dpi=resolution)
 
 plt.figure()
@@ -100,21 +80,8 @@ h_n = plt.loglog(sizes, total["nanoflann"], 'o--')
 h_l = plt.loglog(sizes, total["left-balanced-leaf-full"], '^-')
 plt.xlabel('# points', fontsize=12)
 plt.title(f"k = {k}, build + query time (s)", fontsize=12)
-plt.legend(handles=[h_b[0], h_l[0], h_n[0]], labels=['maple-balanced', 'maple-left-balanced', 'nanoflann'])
-'''
-p = (10 ** 5, 0.1)
-if k == 50:
-    p = (10 ** 5, 0.2)
-elif k == 100:
-    p = (10 ** 5, 0.4)
-plt.annotate('nanoflann', weight='bold', xy = p, color=h_n[0].get_color())
-p = (10 ** 7, 0.8)
-if k == 50:
-    p = (10 ** 7, 2)
-elif k == 100:
-    p = (10 ** 7, 6)
-plt.annotate('maple-balanced', weight='bold', xy = p, color = h_b[0].get_color())
-'''
+plt.legend(handles=[h_b[0], h_l[0], h_n[0]], labels=[
+           'balanced', 'left-balanced', 'nanoflann'])
 plt.savefig(f"{dst}/total-k{k}.{ext}", dpi=resolution)
 
 plt.show()
