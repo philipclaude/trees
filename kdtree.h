@@ -1,5 +1,5 @@
 //
-// mapletrees
+// trees
 // Copyright 2023 Philip Claude Caplan
 //
 // Licensed under the Apache License,
@@ -40,7 +40,7 @@
 #define kdtree_assert(X) assert(X)
 #endif
 
-#define MAPLE_ASSERT(x)                                                  \
+#define KDTREE_ASSERT(x)                                                 \
   {                                                                      \
     if (!(x)) {                                                          \
       std::cerr << "assertion failed: " << #x << " (" << __FILE__ << ":" \
@@ -49,7 +49,7 @@
     }                                                                    \
   }
 
-namespace maple {
+namespace trees {
 
 enum class NearestNeighborApproach : uint8_t { kRecursive = 0, kIterative = 1 };
 struct KdTreeOptions {
@@ -79,7 +79,7 @@ template <typename index_t, typename coord_t> struct NearestNeighborSearch {
 
   NearestNeighborSearch(int n, index_t* n_buffer, coord_t* d_buffer)
       : k(n), neighbors(n_buffer), distances(d_buffer) {
-    MAPLE_ASSERT(k > 1);
+    KDTREE_ASSERT(k > 1);
     reset();
   }
 
@@ -368,7 +368,7 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
 
   void knearest(const coord_t* x,
                 NearestNeighborSearch<index_t, coord_t>& search) const {
-    MAPLE_ASSERT(search.approach == NearestNeighborApproach::kRecursive);
+    KDTREE_ASSERT(search.approach == NearestNeighborApproach::kRecursive);
     search_recursive(x, search);
     search.finalize();
   }
@@ -856,12 +856,12 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
   std::mutex lock_;
 };
 
-}  // namespace maple
+}  // namespace trees
 
 #if HAVE_NANOFLANN
 template <int8_t dim, typename coord_t = double, typename index_t = uint32_t,
           bool with_leaves = true>
-class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
+class KdTree_nanoflann : public trees::KdTreeNd<coord_t, index_t> {
  private:
   class PointCloud {
    public:
@@ -882,7 +882,7 @@ class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
 
  public:
   KdTree_nanoflann(const coord_t* x, size_t n,
-                   maple::KdTreeOptions options = maple::KdTreeOptions())
+                   trees::KdTreeOptions options = trees::KdTreeOptions())
       : cloud_(x, n) {
     tree_ = std::make_unique<nanoflann::KDTreeSingleIndexAdaptor<
         nanoflann::L2_Adaptor<coord_t, PointCloud>, PointCloud, dim> >(
@@ -893,7 +893,7 @@ class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
   }
 
   void knearest(const coord_t* x,
-                maple::NearestNeighborSearch<index_t, coord_t>& search) const {
+                trees::NearestNeighborSearch<index_t, coord_t>& search) const {
     (void)tree_->knnSearch(x, search.k, search.neighbors, search.distances);
   }
 

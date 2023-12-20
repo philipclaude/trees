@@ -33,8 +33,8 @@ int main(int argc, char** argv) {
   const int dim = 3;
   Timer timer;
   bool use_zcurve = true;
-  maple::NearestNeighborApproach approach =
-      maple::NearestNeighborApproach::kRecursive;
+  trees::NearestNeighborApproach approach =
+      trees::NearestNeighborApproach::kRecursive;
   int n_neighbors = 10;
   int leaf_size = 12;
   int n_test = 1;
@@ -46,8 +46,8 @@ int main(int argc, char** argv) {
   if (argc > 4) leaf_size = std::atoi(argv[4]);
   if (argc > 5)
     approach = std::atoi(argv[5]) > 0
-                   ? maple::NearestNeighborApproach::kIterative
-                   : maple::NearestNeighborApproach::kRecursive;
+                   ? trees::NearestNeighborApproach::kIterative
+                   : trees::NearestNeighborApproach::kRecursive;
   if (argc > 6) n_test = std::atoi(argv[6]);
 
   double t_zcurve = 0;
@@ -87,21 +87,21 @@ int main(int argc, char** argv) {
 
     std::cout << "building kdtree for " << n / 1e6 << "M points" << std::endl;
     timer.start();
-    maple::KdTreeOptions options;
+    trees::KdTreeOptions options;
     options.leaf_size = leaf_size;
     options.parallel = true;
 
-    std::shared_ptr<maple::KdTreeNd<coord_t, index_t>> tree{nullptr};
+    std::shared_ptr<trees::KdTreeNd<coord_t, index_t>> tree{nullptr};
     if (method == 0)
-      tree = std::make_shared<maple::KdTree<dim, coord_t, index_t>>(
+      tree = std::make_shared<trees::KdTree<dim, coord_t, index_t>>(
           points.data(), n, options);
     else if (method == 1)
       tree = std::make_shared<
-          maple::KdTree_LeftBalanced<dim, coord_t, index_t, true>>(
+          trees::KdTree_LeftBalanced<dim, coord_t, index_t, true>>(
           points.data(), n, options);
     else if (method == 2) {
       tree = std::make_shared<
-          maple::KdTree_LeftBalanced<dim, coord_t, index_t, false>>(
+          trees::KdTree_LeftBalanced<dim, coord_t, index_t, false>>(
           points.data(), n, options);
     } else if (method == 3) {
       tree = std::make_shared<KdTree_nanoflann<dim, coord_t, index_t>>(
@@ -127,9 +127,9 @@ int main(int argc, char** argv) {
           int capacity = n_neighbors;
           index_t* neighbors = (index_t*)alloca(capacity * sizeof(index_t));
           coord_t* distances = (coord_t*)alloca(capacity * sizeof(coord_t));
-          using Search_t = maple::NearestNeighborSearch<index_t, coord_t>;
+          using Search_t = trees::NearestNeighborSearch<index_t, coord_t>;
           if (method == 3)
-            approach = maple::NearestNeighborApproach::kRecursive;
+            approach = trees::NearestNeighborApproach::kRecursive;
           Search_t search(n_neighbors, neighbors, distances);
           search.approach = approach;
 
@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
   stats.add("t_build", t_build);
   stats.add("k", n_neighbors);
   stats.add("approach",
-            approach == maple::NearestNeighborApproach::kRecursive ? 0 : 1);
+            approach == trees::NearestNeighborApproach::kRecursive ? 0 : 1);
   stats.add("t_knn", t_knn);
   stats.add("leaf_size", used_leaf_size);
   stats.add("memory", memory);

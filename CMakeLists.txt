@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 #set(CMAKE_CXX_COMPILER g++-13)
 
-project(mapletrees LANGUAGES CXX)
+project(trees LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-O3 -fPIC -ffast-math -funroll-loops -ffp-contract=fast -Wall")
