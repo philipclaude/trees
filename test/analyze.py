@@ -11,7 +11,7 @@ method_name = {0: "balanced", 1: "left-balanced-leaf-full",
                2: "left-balanced-leaf-empty", 3: "nanoflann"}
 
 k = 10
-power = [5, 6, 7, 8]
+power = [5, 6, 7]
 sizes = [10 ** p for p in power]
 build = {}
 query = {}

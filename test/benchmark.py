@@ -22,10 +22,10 @@ def full_benchmark():
 
 
 def lite_benchmark():
-    n = [10000, 100000, 1000000, 10000000, 25000000]
+    n = [10000, 100000, 1000000, 10000000]
     k = 10
     nl = 12
-    nt = 5
+    nt = 3
     approach = 0
     for method in [0, 1, 2, 3]:
         run(method, n, k, nl, approach, nt)
