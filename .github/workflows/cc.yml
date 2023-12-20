@@ -68,7 +68,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: results
-        path: figures
+        path: figures/*.png
 
 
   # Single deploy job since we're just deploying
@@ -90,7 +90,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: 'figures/'
+          path: '*.png'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
