@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-set(CMAKE_CXX_COMPILER g++-13)
+#set(CMAKE_CXX_COMPILER g++-13)
 
 project(mapletrees LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
