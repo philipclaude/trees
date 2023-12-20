@@ -54,12 +54,11 @@ namespace maple {
 enum class NearestNeighborApproach : uint8_t { kRecursive = 0, kIterative = 1 };
 struct KdTreeOptions {
   bool parallel{true};
-  int leaf_size{16};
+  uint8_t leaf_size{16};
   int max_dim{-1};
 };
 
 template <typename index_t, typename coord_t> struct NearestNeighborSearch;
-template <typename index_t, typename coord_t> struct RadiusSearch;
 
 template <typename coord_t, typename index_t> class KdTreeNd {
  public:
@@ -67,17 +66,15 @@ template <typename coord_t, typename index_t> class KdTreeNd {
   virtual void knearest(
       const coord_t* x,
       NearestNeighborSearch<index_t, coord_t>& search) const = 0;
-  virtual void rsearch(const coord_t* x,
-                       RadiusSearch<index_t, coord_t>& search) const = 0;
   virtual void print() const = 0;
   virtual double gb() const = 0;
-  virtual int leaf_size() const = 0;
+  virtual uint8_t leaf_size() const = 0;
 };
 
 template <typename index_t, typename coord_t> struct NearestNeighborSearch {
   int n_neighbors{0}, k{0};
-  coord_t* distances{nullptr};
   index_t* neighbors{nullptr};
+  coord_t* distances{nullptr};
   NearestNeighborApproach approach{NearestNeighborApproach::kRecursive};
 
   NearestNeighborSearch(int n, index_t* n_buffer, coord_t* d_buffer)
@@ -115,44 +112,6 @@ template <typename index_t, typename coord_t> struct NearestNeighborSearch {
   inline bool full() const { return n_neighbors == k; }
 };
 
-template <typename index_t, typename coord_t> struct RadiusSearch {
-  int capacity{0}, n_neighbors{0}, k{0};
-  coord_t* distances{nullptr};
-  index_t* neighbors{nullptr};
-  coord_t radius2{0.0};
-  NearestNeighborApproach approach{NearestNeighborApproach::kRecursive};
-
-  RadiusSearch(int n, index_t* n_buffer, coord_t* d_buffer)
-      : k(n), neighbors(n_buffer), distances(d_buffer) {}
-
-  inline void reset() {}
-
-  inline void insert(index_t n, coord_t d) {
-    if (n_neighbors >= capacity) return;
-    assert(n_neighbors < capacity);
-    neighbors[n_neighbors] = n;
-    distances[n_neighbors] = d;
-    n_neighbors++;
-  }
-
-  inline index_t nearest() const { return neighbors[0]; }
-
-  void finalize() {
-    using nn_pair = std::pair<coord_t, index_t>;
-    nn_pair* data = (nn_pair*)alloca(n_neighbors * sizeof(nn_pair));
-    for (size_t i = 0; i < n_neighbors; i++)
-      data[i] = {distances[i], neighbors[i]};
-    std::partial_sort(data, data + k, data + n_neighbors);
-    for (size_t i = 0; i < n_neighbors; i++) {
-      neighbors[i] = data[i].second;
-      distances[i] = data[i].first;
-    }
-  }
-  inline coord_t max_distance() const { return radius2; }
-  inline int size() const { return n_neighbors; }
-  inline bool full() const { return false; }
-};
-
 #ifndef __restrict__
 #define __restrict__
 #endif
@@ -174,10 +133,17 @@ template <> inline uint32_t power_of_two(const uint32_t& x) {
   return 0x80000000 >> __builtin_clz(x);
 }
 
+template <> inline size_t power_of_two(const size_t& x) {
+  static_assert(sizeof(size_t) == sizeof(uint64_t));
+  return 0x8000000000000000 >> __builtin_clzll(x);
+}
+
 template <typename T, uint8_t dim>
 inline T squared_distance(const T* __restrict__ x, const T* __restrict__ y) {
   T d = 0.0;
+#ifndef __GNUC__
 #pragma unroll
+#endif
   for (uint8_t i = 0; i < dim; i++) {
     const T dx = x[i] - y[i];
     d += dx * dx;
@@ -239,7 +205,9 @@ template <int8_t dim, typename coord_t> struct BoundingBox {
   }
 
   void update(const coord_t* x) {
+#ifndef __GNUC__
 #pragma unroll
+#endif
     for (int d = 0; d < dim; ++d) update(x[d], d);
   }
 
@@ -298,8 +266,8 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
 
   index_t build(size_t idx_l, size_t idx_r, int axis, int32_t level) {
     // number of elements in this subtree
-    const index_t n = idx_r - idx_l;
-    if (n <= 0) return nullnode_ptr;
+    const size_t n = idx_r - idx_l;
+    if (idx_r <= idx_l) return nullnode_ptr;
     size_t idx_m = idx_l + n / 2;
 
     // create a leaf if the number of nodes is less than the leaf size
@@ -318,15 +286,19 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
 
     // select the axis for the split
     coord_t xmin[dim], xmax[dim], xavg[dim];
+#ifndef __GNUC__
 #pragma unroll
+#endif
     for (int d = 0; d < dim; d++) {
       xmin[d] = std::numeric_limits<coord_t>::max();
       xmax[d] = std::numeric_limits<coord_t>::min();
       xavg[d] = 0;
     }
-    for (int j = idx_l; j < idx_r; ++j) {
+    for (auto j = idx_l; j < idx_r; ++j) {
       const coord_t* p = points_ + dim * nodes_[j].get_index();
+#ifndef __GNUC__
 #pragma unroll
+#endif
       for (int d = 0; d < dim; ++d) {
         const coord_t& x = p[d];
         xavg[d] += x;
@@ -335,7 +307,9 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
       }
     }
 
+#ifndef __GNUC__
 #pragma unroll
+#endif
     for (int d = 0; d < dim; d++) {
       // xavg[d] /= n;
       // xavg[d] = 0.5 * (xmin[d] + xmax[d]);
@@ -344,7 +318,9 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
 
     axis = 0;
     coord_t lmax = xmax[0] - xmin[0];
+#ifndef __GNUC__
 #pragma unroll
+#endif
     for (int d = 1; d < dim; ++d) {
       const coord_t ld = xmax[d] - xmin[d];
       if (ld > lmax) {
@@ -397,12 +373,6 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
     search.finalize();
   }
 
-  void rsearch(const coord_t* x, RadiusSearch<index_t, coord_t>& search) const {
-    MAPLE_ASSERT(search.approach == NearestNeighborApproach::kRecursive);
-    search_recursive(x, search);
-    search.finalize();
-  }
-
   void print() const {
     std::cout << "root = " << root_index_ - 1 << std::endl;
     for (size_t i = 0; i < nodes_.size(); i++) {
@@ -432,7 +402,7 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
   }
 
   auto& nodes() { return nodes_; }
-  int leaf_size() const { return leaf_size_; }
+  uint8_t leaf_size() const { return leaf_size_; }
 
  private:
   template <typename Search_t>
@@ -517,7 +487,7 @@ class KdTree : public KdTreeNd<coord_t, index_t> {
   std::vector<node_t> nodes_;
   std::vector<std::thread> threads_;
   int paralevel_{-1};
-  const int leaf_size_;
+  const uint8_t leaf_size_;
   index_t root_index_;
   int max_dim_;
   box_t root_box_;
@@ -614,9 +584,10 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
       : points_(points),
         nodes_(n_points + 1),
         index_(n_points),
-        leaf_size_(std::min(options.leaf_size, int(max_4_bits))),
+        leaf_size_(std::min(options.leaf_size, max_4_bits)),
         max_dim_(options.max_dim) {
     const auto n_shift_bits = std::max(n_aux_bits, n_axis_bits);
+    (void)(n_shift_bits);  // silence warning about unused variable
     assert(n_points << n_shift_bits < std::numeric_limits<index_t>::max());
     if (options.max_dim < 0) max_dim_ = dim;
     for (index_t i = 0; i < n_points; i++) index_[i] = i;
@@ -633,7 +604,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
   }
 
   void build(size_t nc, size_t nl, size_t nr, int axis, int32_t level) {
-    const index_t n = nr - nl;
+    const size_t n = nr - nl;
     assert(n > 0);
     assert(nc < nodes_.size());
 
@@ -644,7 +615,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
         nodes_[nc].set_leaf();
         nodes_[nc].set_n_leaf(n);
         nodes_[nc].set_aux(n_leaf_);
-        for (int j = 0; j < n; j++) leaves_[n_leaf_ + j] = index_[nl + j];
+        for (size_t j = 0; j < n; j++) leaves_[n_leaf_ + j] = index_[nl + j];
         n_leaf_ += n;
         lock_.unlock();
         return;
@@ -659,12 +630,14 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
 
     // select the axis for the split
     coord_t xmin[dim], xmax[dim];
+#ifndef __GNUC__
 #pragma unroll
+#endif
     for (int d = 0; d < dim; d++) {
       xmin[d] = std::numeric_limits<coord_t>::max();
       xmax[d] = std::numeric_limits<coord_t>::min();
     }
-    for (int j = nl; j < nr; j++) {
+    for (size_t j = nl; j < nr; j++) {
       const coord_t* p = &points_[dim * index_[j]];
       for (int d = 0; d < dim; d++) {
         const coord_t& x = p[d];
@@ -675,7 +648,9 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
 
     axis = 0;
     coord_t s = xmax[0] - xmin[0];
+#ifndef __GNUC__
 #pragma unroll
+#endif
     for (int d = 1; d < dim; d++) {
       const coord_t ld = xmax[d] - xmin[d];
       if (ld > s) {
@@ -746,16 +721,6 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
     search.finalize();
   }
 
-  void rsearch(const coord_t* x, RadiusSearch<index_t, coord_t>& search) const {
-    if (search.approach == NearestNeighborApproach::kIterative)
-      search_iterative(x, search);
-    else {
-      assert(search.approach == NearestNeighborApproach::kRecursive);
-      search_recursive(x, search, 1);
-    }
-    search.finalize();
-  }
-
   void print() const {
     for (size_t i = 1; i < nodes_.size(); i++) {
       std::cout << "[" << i << "] ";
@@ -771,7 +736,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
     return double(n_bytes) / 1e9;
   }
 
-  int leaf_size() const { return leaf_size_; }
+  uint8_t leaf_size() const { return leaf_size_; }
 
  private:
   template <typename Search_t>
@@ -886,7 +851,7 @@ class KdTree_LeftBalanced : public KdTreeNd<coord_t, index_t> {
   size_t n_leaf_{0};
   std::vector<std::thread> threads_;
   int paralevel_{-1};
-  const int leaf_size_;
+  const uint8_t leaf_size_;
   int max_dim_;
   std::mutex lock_;
 };
@@ -932,12 +897,6 @@ class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
     (void)tree_->knnSearch(x, search.k, search.neighbors, search.distances);
   }
 
-  void rsearch(const coord_t* x,
-               maple::RadiusSearch<index_t, coord_t>& search) const {
-    std::cout << "not implemented" << std::endl;
-    MAPLE_ASSERT(false);
-  }
-
   index_t nearest(const coord_t* x) const {
     coord_t distance;
     index_t neighbor;
@@ -947,7 +906,7 @@ class KdTree_nanoflann : public maple::KdTreeNd<coord_t, index_t> {
 
   double gb() const { return double(tree_->usedMemory(*tree_)) / 1e9; }
   void print() const {}
-  int leaf_size() const { return tree_->leaf_max_size_; }
+  uint8_t leaf_size() const { return tree_->leaf_max_size_; }
 
  private:
   PointCloud cloud_;

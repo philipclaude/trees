@@ -6,12 +6,10 @@
 
 struct json {
   json() { str = "{\n"; }
-  template <typename T>
-  std::string convert(const T& v) {
+  template <typename T> std::string convert(const T& v) {
     return std::to_string(v);
   }
-  template <typename T>
-  void add(const std::string& key, const T& v) {
+  template <typename T> void add(const std::string& key, const T& v) {
     if (n_keys > 0) str += ",\n";
     str += "\t\"" + key + "\": " + convert(v);
     n_keys++;
@@ -22,10 +20,7 @@ struct json {
   std::string str;
 };
 
-template <>
-std::string json::convert(const std::string& v) {
-  return v;
-}
+template <> std::string json::convert(const std::string& v) { return v; }
 
 using index_t = uint32_t;
 using coord_t = double;
@@ -69,16 +64,16 @@ int main(int argc, char** argv) {
     std::vector<index_t> order(n);
     timer.stop();
     std::cout << "alloc time = " << timer.seconds() << " s. " << std::endl;
-    for (auto& x : coord)
-      x = coord_t(rand()) / coord_t(RAND_MAX);
+    for (auto& x : coord) x = coord_t(rand()) / coord_t(RAND_MAX);
 
-    timer.start();
-    sort_points_on_zcurve(coord.data(), n, dim, order);
-    timer.stop();
-    std::cout << "zcurve time = " << timer.seconds() << " s. " << std::endl;
-    t_zcurve += timer.seconds() / n_test;
+    if (use_zcurve) {
+      timer.start();
+      sort_points_on_zcurve(coord.data(), n, dim, order);
+      timer.stop();
+      std::cout << "zcurve time = " << timer.seconds() << " s. " << std::endl;
+      t_zcurve += timer.seconds() / n_test;
+    }
 
-    coord_t x[dim];
     std::parafor_i(0, n, [&](int thread_id, index_t i) {
       for (int d = 0; d < dim; d++)
         points[dim * i + d] = coord[dim * order[i] + d];
@@ -125,7 +120,7 @@ int main(int argc, char** argv) {
     std::vector<int> n_k(n_thread, 0), n_p(n_thread);
     std::parafor_i(
         0, n,
-        [&](int tid, int i) {
+        [&](int tid, size_t i) {
           int capacity = n_neighbors;
           index_t* neighbors = (index_t*)alloca(capacity * sizeof(index_t));
           coord_t* distances = (coord_t*)alloca(capacity * sizeof(coord_t));
