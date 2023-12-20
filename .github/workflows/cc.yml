@@ -11,7 +11,7 @@ env:
   BUILD_TYPE: RelWithDebInfo
 
 jobs:
-  cc-build-format-test:
+  build-lint-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
     - name: build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-    - name: format
+    - name: lint
       uses: cpp-linter/cpp-linter-action@v2
       id: linter
       env:
@@ -47,6 +47,7 @@ jobs:
         mv *.json results/
         mkdir figures
         python ../test/analyze.py
+        mv *.png ../
         echo "![](figures/build-k10.png)" >> $GITHUB_STEP_SUMMARY
         echo "![](figures/total-k10.png)" >> $GITHUB_STEP_SUMMARY
         echo "![](figures/query-k10.png)" >> $GITHUB_STEP_SUMMARY
