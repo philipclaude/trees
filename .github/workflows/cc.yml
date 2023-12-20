@@ -47,10 +47,10 @@ jobs:
         mv *.json results/
         mkdir figures
         python ../test/analyze.py
-        mv *.png ../
-        echo "![](figures/build-k10.png)" >> $GITHUB_STEP_SUMMARY
-        echo "![](figures/total-k10.png)" >> $GITHUB_STEP_SUMMARY
-        echo "![](figures/query-k10.png)" >> $GITHUB_STEP_SUMMARY
+        mv figures/*.png ../
+        echo "![](build-k10.png)" >> $GITHUB_STEP_SUMMARY
+        echo "![](total-k10.png)" >> $GITHUB_STEP_SUMMARY
+        echo "![](query-k10.png)" >> $GITHUB_STEP_SUMMARY
 
 
 
