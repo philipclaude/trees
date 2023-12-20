@@ -62,16 +62,14 @@ jobs:
         mv *.json results/
         mkdir figures
         python ../test/analyze.py
-        mv figures ../
+        mv figures ../results
         cd ..
     - name: upload results
       uses: actions/upload-artifact@v3
       with:
         name: results
-        path: figures/*.png
+        path: figures
 
-
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
@@ -90,7 +88,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: '*.png'
+          path: './results'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
