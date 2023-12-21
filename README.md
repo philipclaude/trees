@@ -58,10 +58,7 @@ The `trees` library was primarily compared with the `nanoflann` library since th
 
 A smaller set of tests are run using GitHub Actions during each pull request. The latest results for these tests are updated here:
 
-<img src="https://middpolymer.github.io/trees/build-k10.png
-" width=250/><img src="https://middpolymer.github.io/trees/query-k10.png
-" width=250/><img src="https://middpolymer.github.io/trees/total-k10.png
-" width=250/>
+<img src="https://middpolymer.github.io/trees/build-k10.png" width=300/><img src="https://middpolymer.github.io/trees/query-k10.png" width=300/><img src="https://middpolymer.github.io/trees/total-k10.png" width=300/>
 
 Both balanced and left-balanced (with leaf buckets) trees require `3 x sizeof(index_t)` bytes per point. The left-balanced tree without leaf buckets requires `sizeof(index_t)` bytes per point. `nanoflann` seems to require between 3-4 `x sizeof(index_t)` per point.
 
