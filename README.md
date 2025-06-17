@@ -54,11 +54,11 @@ There is some initial support for a radius search (i.e. all points within a radi
 
 ### **Performance**
 
-The `trees` library was primarily compared with the `nanoflann` library since that is what I mostly used in the past. Overall, construction is faster than `nanoflann`, but querying can be slower. However, the crossover of when this happens usually occurs for problems that I don't generally work on, specifically when doing an all-nearest neighbor query for k > 100. Hopefully, the data included in the **Issues** tab will help to know which kdtree library to select for your application. The latest results are described [here](https://github.com/middleburygcl/trees/issues/1).
+The `trees` library was primarily compared with the `nanoflann` library since that is what I mostly used in the past. Overall, construction is faster than `nanoflann`, but querying can be slower. However, the crossover of when this happens usually occurs for problems that I don't generally work on, specifically when doing an all-nearest neighbor query for k > 100. Hopefully, the data included in the **Issues** tab will help to know which kdtree library to select for your application. The latest results are described [here](https://github.com/philipclaude/trees/issues/1).
 
 A smaller set of tests are run using GitHub Actions during each pull request. The latest results for these tests are updated here:
 
-<img src="https://middleburygcl.github.io/trees/build-k10.png" width=300/><img src="https://middleburygcl.github.io/trees/query-k10.png" width=300/><img src="https://middleburygcl.github.io/trees/total-k10.png" width=300/>
+<img src="https://philipclaude.github.io/trees/build-k10.png" width=300/><img src="https://philipclaude.github.io/trees/query-k10.png" width=300/><img src="https://philipclaude.github.io/trees/total-k10.png" width=300/>
 
 Both balanced and left-balanced (with leaf buckets) trees require `3 x sizeof(index_t)` bytes per point. The left-balanced tree without leaf buckets requires `sizeof(index_t)` bytes per point. `nanoflann` seems to require between 3-4 `x sizeof(index_t)` per point.
 
@@ -66,7 +66,7 @@ Both balanced and left-balanced (with leaf buckets) trees require `3 x sizeof(in
 
 The `trees` library is distributed under the Apache-2.0 License.
 
-Copyright 2023 Philip Claude Caplan
+Copyright 2023 - 2025 Philip Claude Caplan
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
