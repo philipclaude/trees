@@ -60,7 +60,7 @@ jobs:
         mv figures ../results
         cd ..
     - name: upload results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: results
         path: results
@@ -77,7 +77,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: results
       - name: Upload artifact
